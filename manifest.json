@@ -1,0 +1,10 @@
+{
+  "name":"Suggest-A-Movie",
+  "short_name":"SAM",
+  "description": "This app suggests movies to users",
+  "icons": {
+    "src":"/img/favicon-16x16.png",
+    "sizes":"16x16",
+    "type":"image/png"
+  }
+}
