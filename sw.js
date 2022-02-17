@@ -1,3 +1,5 @@
+'use strict'
+
 const version = 1;
 const isOnline = true;
 const staticCache = `PWA-Static-Movie-APP-${version}`;
