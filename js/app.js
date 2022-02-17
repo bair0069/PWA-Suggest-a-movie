@@ -10,10 +10,10 @@ const APP = {
         //when the page loads
         //open the database
         APP.openDatabase(APP.registerSW); //register the service worker after the DB is open
-        
     },
     registerSW: ()=>{
         //register the service worker
+        navigator.serviceWorker.register('./sw.js')
 
         //then add listeners and run page specific code
         APP.pageSpecific();
