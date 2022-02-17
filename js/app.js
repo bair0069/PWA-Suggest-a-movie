@@ -91,7 +91,10 @@ const APP = {
     console.log("adding listeners");
     //add listeners
     //when the search form is submitted
-    APP.searchForm.addEventListener("submit", APP.searchFormSubmitted);
+    APP.searchForm.addEventListener("submit", (ev)=>{
+      ev.preventDefault();
+      APP.searchFormSubmitted(ev)
+    });
     //when clicking on the list of possible searches on home or 404 page
     //when a message is received
     //when online and offline
@@ -123,15 +126,15 @@ const APP = {
     //send a message to the service worker
   },
   searchFormSubmitted: (ev) => {
-    log(ev);
     ev.preventDefault();
+    log(ev);
     console.log("WAKE UP");
     //get the keyword from teh input
     let search = APP.searchField.value;
     if (search.length) {
       APP.getConfig(search);
     }
-    APP.navigate(`http://127.0.0.1:5500/results.html?inputSearch=${search}`)
+    // APP.navigate(`http://127.0.0.1:5500/results.html?inputSearch=${search}`);
   },
   //make sure it is not empty
   //check the db for matches
@@ -139,7 +142,6 @@ const APP = {
   //save results to db
   //navigate to url
   getConfig: (keyword) => {
-    log(APP.url);
     fetch(APP.url)
       .then((response) => {
         return response.json();
@@ -147,11 +149,12 @@ const APP = {
       .then((data) => {
         APP.tmdbIMAGEBASEURL = data.images.secure_base_url;
         APP.configData = data.images;
+        log(data)
         APP.getSearchResults(keyword);
       })
       .catch((err) => {
         {
-          console.warn(err);
+          console.log(err);
         }
       });
   },
@@ -187,6 +190,7 @@ const APP = {
         //handle the NetworkError
       });
   },
+
   getSearchResults: (keyword) => {
     console.log("searching");
     //check if online
@@ -197,7 +201,7 @@ const APP = {
         APP.results = data.results;
         APP.displayCards();
       })
-      .catch((err) => alert(`Fetch failed due to: ${err}`));
+      .catch((err) => alert(`Fetch failed due to: ${err.message}`));
     //check in DB for match of keyword in searchStore
     //if no match in DB do a fetch
     // APP.displayCards is the callback
@@ -215,17 +219,19 @@ const APP = {
     cards.setAttribute("class", "movieCards");
     cards.textContent = "";
     let df = document.createDocumentFragment();
-    APP.results.map((item) => {
+    APP.results.forEach((item) => {
       let li = document.createElement("li");
-      li.setAttribute('class','card')
-      li.textContent=`<h2>${item.title}</h2><img src= ${item.poster_path} alt= A movie poster of ${item.title}> <h3>Released: ${item.release_date}</h3> <p>${item.popularity}</p>`
-      df.append(li)
+      li.setAttribute("class", "card");
+      li.innerHTML = `<h2>${item.title}</h2><img src= ${APP.tmdbIMAGEBASEURL}w185${item.poster_path} alt= A movie poster of ${item.title}> <h3>Released: ${item.release_date}</h3> <p>${item.popularity}</p>`;
+      df.append(li);
     });
-    cards.append(df)
+    cards.append(df);
+    document.getElementById('resultsCards').append(cards)
+  },
     //display all the movie cards based on the results array
     // in APP.results
     //these results could be from the database or from a fetch
-  },
+
   navigate: (url) => {
     //change the current page
     window.location = url; //this should include the querystring
