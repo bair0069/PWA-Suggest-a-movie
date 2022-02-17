@@ -4,12 +4,26 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Movie Search Home Page</title>
+    <title>Home</title>
     <link rel="stylesheet" href="./css/main.css" />
     <!-- Add all the link and meta tags and google font css -->
-    <link rel="apple-touch-icon" sizes="180x180" href="./img/apple-touch-icon.png" />
-    <link rel="icon" type="image/png" sizes="32x32" href="./img/favicon-32x32.png" />
-    <link rel="icon" type="image/png" sizes="16x16" href="./img/favicon-16x16.png" />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="./img/apple-touch-icon.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="./img/favicon-32x32.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="./img/favicon-16x16.png"
+    />
     <link rel="manifest" href="/site.webmanifest" />
     <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#2e6b68" />
     <meta name="msapplication-TileColor" content="#b91d47" />
@@ -18,7 +32,12 @@
   <body id="home">
     <div class="container">
       <header class="masthead">
-        <h1>Suggest A Movie</h1>
+        <h1>Suggest-A-Movie</h1>
+        <section class="searchArea">
+          <form id="searchForm" name="searchForm">
+            <input type="search" id="inputSearch" name="inputSearch" value="" />
+          </form>
+        </section>
       </header>
       <main>
         <section class="titleArea">
@@ -28,11 +47,6 @@
           <!-- list would be the list of matching searches OR the movie cards -->
         </section>
       </main>
-      <section class="searchArea">
-        <form id="searchForm" name="searchForm">
-          <input type="search" id="inputSearch" name="inputSearch" value="" />
-        </form>
-      </section>
     </div>
     <script src="./js/app.js" defer></script>
   </body>

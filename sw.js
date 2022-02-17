@@ -1,4 +1,5 @@
 const version = 1;
+const isOnline = true;
 const staticCache = `PWA-Static-Movie-APP-${version}`;
 const dynamicCache = `PWA-Dynamic-Movie-APP-${version}`;
 const cacheLimit = 100;
@@ -18,6 +19,7 @@ const cacheList = [
   "./img/favicon-16x16.png",
   "./img/favicon-32x32.png",
   "./img/mstile-150x150.png",
+  "./img/offline-1.png",
   "./img/safari-pinned-tab.svg",
   //fonts:
   "https://fonts.googleapis.com/css2?family=Expletus+Sans&display=swap",
@@ -60,7 +62,6 @@ self.addEventListener("fetch", (ev) => {
         cacheRes ||
         fetch(ev.request)
           .then((fetchRes) => {
-            //TODO: check here for the 404 error
             if (!fetchRes.ok) throw new Error(fetchRes.statusText);
             return caches.open(dynamicCache).then((cache) => {
               let copy = fetchRes.clone(); //make a copy of the response
@@ -85,6 +86,11 @@ self.addEventListener("fetch", (ev) => {
 
 self.addEventListener("message", (ev) => {
   //check ev.data to get the message
+  console.log(ev.data);
+  //message received from script
+  if (ev.data.ONLINE) {
+    isOnline = ev.data.ONLINE;
+  }
 });
 
 function sendMessage(msg) {
