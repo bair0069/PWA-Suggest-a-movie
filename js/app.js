@@ -55,8 +55,8 @@ const APP = {
       }
 
       let options = {
-        keyPath:'id', // this creates a required unique id for each stored document
-        autoIncrement:false, // prevent auto Incrementing
+        keyPath:'keyword', // this creates a required unique id for each stored document
+        autoIncrement:true, // prevent auto Incrementing
       }
 
       let searchStore = APP.DB.createObjectStore('searchStore',options);
@@ -89,27 +89,28 @@ const APP = {
   getDBResults: (storeName, keyValue) => {
     //return the results from storeName where it matches keyValue
   },
-  addResultsToDB: (tx, results, index = 0)=>{
-      // console.log({ tx });
-      // console.log(books);
-      // console.log(index);
+  addResultsToDB: (tx, results, index = 0, keyword)=>{
+      console.log({ tx });
+      console.log(index);
+      results.keyword = keyword
+
       let searchStore = tx.objectStore('searchStore');
-      let addRequest = searchStore.add(results[index]);
+      let addRequest = searchStore.add(results);
     
       //handle the successful completion of the add
       addRequest.onsuccess = (ev) => {
-        index++;
-        if (index < results.length) {
-          console.log('about to add movie', index);
-          APP.addResultsToDB(tx, results, index);
-          //recursively call the addBooks method
-          //inside the same transaction
-        } else {
-          //done adding all the BOOKS
-        }
+        log('successfully added', keyword)
+        // index++;
+        // if (index < results.length) {
+        //   console.log('about to add movie', index);
+        //   APP.addResultsToDB(tx, results, index);
+        //   //inside the same transaction
+        // } else {
+        //   //done adding all the documents
+        // }
       }
       addRequest.onerror = (err) => {
-        console.warn('Failed to add', err.message);
+        console.warn('Failed to add', err);
       };
       APP.displayCards()
     },
@@ -281,7 +282,7 @@ const APP = {
         APP.results = data.results;
         let tx = APP.DB.transaction('searchStore', 'readwrite')
         log({tx});
-        APP.addResultsToDB(tx,APP.results,0)
+        APP.addResultsToDB(tx,APP.results,0,APP.keyword)
         
       })
       .catch((err) => console.warn(`Fetch failed due to: ${err.message}`));
