@@ -61,26 +61,49 @@ small, .text_small {font-size: 0.8rem;}
 }
 
 .movieCards{
-  margin:0 auto;
+  padding:0;
   display: flex;
-  align-items: center;
-  gap:.5rem;
   flex-flow: row wrap;
-  justify-content: space-around;
-
+  justify-content: center;
 }
 
 .card {
   width:15rem;
-  display: flex;
+  display:flex;
   text-align: center;
   flex-direction: column;
-  align-items: center;
   justify-content: space-around;
+  outline-width: .25rem;
+  outline-color:var(--secondary-dark);
+  outline-style:solid;
+  color:var(--secondary);
+  overflow: hidden;
 }
 
 .card:nth-child(2n){
-  background-color: var(-secondary);
-  color: var(-white);
+  background-color: var(--secondary-dark);
+  color: var(--white);
+  outline-width: .25rem;
+  outline-color:var(--primary-light);
+  outline-style:solid; 
 }
 
+
+/*===============================    Tablet Size         ============================= */
+@media only screen and (min-width:45rem) {
+  
+  html {
+    font-size:120%;
+  }
+  /* - - - - - - - - - - - - - - - - Cards - - - - - - - - - - - - - - - */
+}
+
+
+/*===============================    Laptop Size         ============================= */
+@media only screen and (min-width:70rem) {
+  
+  html {
+    font-size:135%;
+  }
+  /* - - - - - - - - - - - - - - - - Cards - - - - - - - - - - - - - - - */
+}

@@ -199,12 +199,12 @@ const APP = {
       .then((response) => response.json())
       .then((data) => {
         APP.results = data.results;
-        APP.displayCards();
+        APP.displayCards()
       })
       .catch((err) => alert(`Fetch failed due to: ${err.message}`));
-    //check in DB for match of keyword in searchStore
-    //if no match in DB do a fetch
-    // APP.displayCards is the callback
+      //check in DB for match of keyword in searchStore
+      //if no match in DB do a fetch
+      // APP.displayCards is the callback
   },
   getSuggestedResults: (movieid) => {
     //check if online
@@ -214,19 +214,21 @@ const APP = {
   },
   displayCards: () => {
     console.log(APP.results);
-
-    let cards = document.createElement("ul");
-    cards.setAttribute("class", "movieCards");
-    cards.textContent = "";
+    let resultsCards = document.getElementById('resultsCards')
+    resultsCards.textContent="";
+    let cardsList = document.createElement("ul");
+    console.log('clearing')
+    cardsList.setAttribute("class", "movieCards");
     let df = document.createDocumentFragment();
+    log(`${APP.tmdbIMAGEBASEURL}w500${APP.results[0].poster_path}`)
     APP.results.forEach((item) => {
       let li = document.createElement("li");
       li.setAttribute("class", "card");
       li.innerHTML = `<h2>${item.title}</h2><img src= ${APP.tmdbIMAGEBASEURL}w185${item.poster_path} alt= A movie poster of ${item.title}> <h3>Released: ${item.release_date}</h3> <p>${item.popularity}</p>`;
       df.append(li);
     });
-    cards.append(df);
-    document.getElementById('resultsCards').append(cards)
+    cardsList.append(df);
+    resultsCards.append(cardsList)
   },
     //display all the movie cards based on the results array
     // in APP.results
