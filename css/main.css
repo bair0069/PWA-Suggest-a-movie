@@ -10,6 +10,11 @@ html {
   box-sizing: inherit;
 }
 
+body {
+  color:var(--primary);
+  background-color: var(--secondary-dark);
+}
+
 /* - - - - - - - - - - - - - - - - Type Scale - - - - - - - - - - - - - - - */
 
 
@@ -51,16 +56,34 @@ small, .text_small {font-size: 0.8rem;}
   --accent: #DB592A;
   --white:#f9fbfb;
 }
+/* = = = = = = = = = = = = = = = = Header = = = = = = = = = = = = = = = */
+
+header{
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* - - - - - - - - - - - - - - - - Search Bar - - - - - - - - - - - - - - - */
+
+#inputSearch {
+  height:2rem;
+  font-size: 2rem;
+  font-family: "Faustina" , serif;
+  width:100%;
+}
+
+#inputSearch:placeholder{
+  fill:var(--primary-light);
+}
+
+/* = = = = = = = = = = = = = = = = = = = Main = = = = = = = = = = = = = = = = = = */
+
 
 /* - - - - - - - - - - - - - - - - Cards - - - - - - - - - - - - - - - */
 
 #resultsCards {
-  display:flex;
-  justify-content: center;
   margin: 0,0;
-}
-
-.movieCards{
   padding:0;
   display: flex;
   flex-flow: row wrap;
@@ -73,6 +96,7 @@ small, .text_small {font-size: 0.8rem;}
   text-align: center;
   flex-direction: column;
   justify-content: space-around;
+  background-color: var(--white);
   outline-width: .25rem;
   outline-color:var(--secondary-dark);
   outline-style:solid;
@@ -86,6 +110,14 @@ small, .text_small {font-size: 0.8rem;}
   outline-width: .25rem;
   outline-color:var(--primary-light);
   outline-style:solid; 
+}
+
+.card:hover {
+  cursor:pointer;
+  outline: solid .25rem var(--accent);
+  transition-duration: .25s;
+  transform: scaleX(1.15)
+            scaleY(1.15);
 }
 
 

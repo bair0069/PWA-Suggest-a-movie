@@ -2,8 +2,8 @@
 
 const version = 1;
 const isOnline = true;
-const staticCache = `PWA-Static-Movie-APP-${version}`;
-const dynamicCache = `PWA-Dynamic-Movie-APP-${version}`;
+const staticCache = `PWA-Static-Search-APP-${version}`;
+const dynamicCache = `PWA-Dynamic-Search-APP-${version}`;
 const cacheLimit = 100;
 const cacheList = [
   //Pages
@@ -12,6 +12,8 @@ const cacheList = [
   "./results.html",
   "./suggest.html",
   "./404.html",
+  //styles
+  "./css/main.css",
   //manifest:
   "./manifest.json",
   //favicons:
@@ -22,12 +24,14 @@ const cacheList = [
   "./img/favicon-32x32.png",
   "./img/mstile-150x150.png",
   "./img/offline-1.png",
+  "./img/noimage.png",
   "./img/safari-pinned-tab.svg",
   //fonts:
   "https://fonts.googleapis.com/css2?family=Expletus+Sans&display=swap",
   "https://fonts.googleapis.com/css2?family=Raleway&display=swap",
   "https://fonts.googleapis.com/css2?family=Faustina&display=swap",
   // any extra js files:
+  "./js/app.js"
 ];
 
 self.addEventListener("install", (ev) => {
