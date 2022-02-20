@@ -13,6 +13,7 @@ html {
 body {
   color:var(--primary);
   background-color: var(--secondary-dark);
+  font-family: "Faustina", serif;
 }
 
 /* - - - - - - - - - - - - - - - - Type Scale - - - - - - - - - - - - - - - */
@@ -60,8 +61,11 @@ small, .text_small {font-size: 0.8rem;}
 
 header{
   display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   align-items: center;
   gap: 1rem;
+  margin-bottom:1rem;
 }
 
 /* - - - - - - - - - - - - - - - - Search Bar - - - - - - - - - - - - - - - */
@@ -70,7 +74,7 @@ header{
   height:2rem;
   font-size: 2rem;
   font-family: "Faustina" , serif;
-  width:100%;
+  width:max(15rem,100%);
 }
 
 #inputSearch:placeholder{
@@ -80,6 +84,14 @@ header{
 /* = = = = = = = = = = = = = = = = = = = Main = = = = = = = = = = = = = = = = = = */
 
 
+/* - - - - - - - - - - - - - - - - titleArea - - - - - - - - - - - - - - - */
+
+.titleArea p {
+  font-family: "Raleway", sans-serif;
+  color: var(--white);
+  font-size: 2rem;
+  text-align: center
+}
 /* - - - - - - - - - - - - - - - - Cards - - - - - - - - - - - - - - - */
 
 #resultsCards {
@@ -98,7 +110,7 @@ header{
   justify-content: space-around;
   background-color: var(--white);
   outline-width: .25rem;
-  outline-color:var(--secondary-dark);
+  outline-color:var(--secondary);
   outline-style:solid;
   color:var(--secondary);
   overflow: hidden;
@@ -112,12 +124,59 @@ header{
   outline-style:solid; 
 }
 
+.suggested {
+  display: flex;
+  font-size: 1.25rem;
+  flex-direction: column;
+  color: var(--secondary);
+  border: .25rem solid var(--accent);
+  border-radius: 2rem;
+  margin:.25rem;
+}
+
+.suggested:hover {
+  color:var(--white);
+  background-color:var(--secondary-dark);
+}
+
+.suggested:active {
+  color:var(--secondary-light);
+  background-color:var(--secondary-dark);
+}
+
+.card:nth-child(2n) .suggested{
+  color:var(--primary);
+}
+
+.card:nth-child(2n) .suggested:hover{
+  color:var(--secondary-dark);
+  background-color: var(--white);
+}
+
+
+
 .card:hover {
   cursor:pointer;
   outline: solid .25rem var(--accent);
   transition-duration: .25s;
   transform: scaleX(1.15)
             scaleY(1.15);
+  box-shadow: 0rem 1rem 1rem black;
+}
+
+.card .description {
+  transform: translateY(100%);
+  display: none;
+  padding:0rem 1rem;
+}
+
+.card.active .description {
+  transform:translateY(0);
+  display:grid;
+}
+
+.card.active img {
+  display: none;
 }
 
 

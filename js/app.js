@@ -55,8 +55,8 @@ const APP = {
       }
 
       let options = {
-        keyPath:'keyword', // this creates a required unique id for each stored document
-        autoIncrement:true, // prevent auto Incrementing
+        keyPath:'keyword', // this creates a required unique keyword for each stored document
+        autoIncrement:false, // prevent auto Incrementing
       }
 
       let searchStore = APP.DB.createObjectStore('searchStore',options);
@@ -88,6 +88,7 @@ const APP = {
   },
   getDBResults: (storeName, keyValue) => {
     //return the results from storeName where it matches keyValue
+
   },
   addResultsToDB: (tx, results, index = 0, keyword)=>{
       console.log({ tx });
@@ -216,7 +217,7 @@ const APP = {
   //do a fetch call for search results
   //save results to db
   //navigate to url
-  getConfig: (keyword) => {
+  getConfig: () => {
     fetch(APP.url)
       .then((response) => {
         return response.json();
@@ -225,7 +226,7 @@ const APP = {
         APP.tmdbIMAGEBASEURL = data.images.secure_base_url;
         APP.configData = data.images;
         log(data)
-        APP.getSearchResults(keyword);
+        APP.getSearchResults();
       })
       .catch((err) => {
         {
@@ -234,17 +235,29 @@ const APP = {
       });
   },
   cardListClicked: (ev) => {
-
+    ev.target.closest('li').classList.toggle('active');
     log('card clicked')
-    log(ev.target.getAttribute('data-id'))
+    let id = ev.target.parentNode.getAttribute('data-id')
+    log(id)
+    let url = `https://api.themoviedb.org/3/movie/${id}/recommendations?api_key=${APP.tmdbAPIKEY}&language=en-US&page=1`
     // user clicked on a movie card
     //get the title and movie id
+    
+    // search results for index to get movie id and title
+  let index = APP.results.findIndex(element=>element.id  == id)
+  let title = APP.results[index].title
+  log(title)
+  APP.suggestedClicked(index)
+},
+  suggestedClicked:(index)=>{
+
     //check the db for matches
     //do a fetch for the suggest results
     //save results to db
     //build a url
     //navigate to the suggest page
-  },
+  }
+  ,
   // getData: (endpoint, callback) => {
   //   //do a fetch call to the endpoint
   //   let url =
@@ -270,12 +283,12 @@ const APP = {
   //     });
   // },
 
-  getSearchResults: (keyword) => {
+  getSearchResults: () => {
     console.log("searching");
     //check if online
     if(APP.isOnline){
       //if no match in DB do a fetch
-    let url = `https://api.themoviedb.org/3/search/movie?api_key=${APP.tmdbAPIKEY}&language=en-US&query=${keyword}&page=1&include_adult=false`
+    let url = `https://api.themoviedb.org/3/search/movie?api_key=${APP.tmdbAPIKEY}&language=en-US&query=${APP.keyword}&page=1&include_adult=false`
     fetch(url)
       .then((response) => response.json())
       .then((data) => {
@@ -293,11 +306,20 @@ const APP = {
   },
   getSuggestedResults: (movieid) => {
     //check if online
+    if (APP.isOnline){
+
+    }
     //check in DB for match of movieid in suggestStore
     //if no match in DB do a fetch
     // APP.displayCards is the callback
   },
   displayCards: () => {
+    let titleArea = document.querySelector('.titleArea')
+    titleArea.innerHTML=`<p class="resultsMessage"> Showing results for  "${APP.keyword}" </p>`
+    
+    //display all the movie cards based on the results array
+    // in APP.results
+    //these results could be from the database or from a fetch
     console.log(APP.results);
     let resultsCards = document.getElementById('resultsCards')
     resultsCards.textContent="";
@@ -312,15 +334,12 @@ const APP = {
       let li = document.createElement("li");
       li.setAttribute("class", "card")
       li.setAttribute('data-id',item.id);
-      li.innerHTML = `<h2>${item.title}</h2><h3>Released: ${item.release_date}</h3><p>${item.popularity}</p>`;
-      li.append(img)
+      li.innerHTML = `<h2>${item.title}</h2><div class="description"><p>${item.overview}</p></div> <h3> <a class="suggested">Suggested Movies</a> </h3>`;
+      li.prepend(img)
       APP.df.append(li);
     });
     resultsCards.append(APP.df)
   },
-    //display all the movie cards based on the results array
-    // in APP.results
-    //these results could be from the database or from a fetch
 
   navigate: (url) => {
     //change the current page
