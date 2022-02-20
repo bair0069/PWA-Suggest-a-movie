@@ -124,7 +124,7 @@ header{
   outline-style:solid; 
 }
 
-.suggested {
+.suggested a {
   display: flex;
   font-size: 1.25rem;
   flex-direction: column;
@@ -134,21 +134,21 @@ header{
   margin:.25rem;
 }
 
-.suggested:hover {
+.suggested a:hover {
   color:var(--white);
   background-color:var(--secondary-dark);
 }
 
-.suggested:active {
+.suggested a:active {
   color:var(--secondary-light);
   background-color:var(--secondary-dark);
 }
 
-.card:nth-child(2n) .suggested{
+.card:nth-child(2n) .suggested a {
   color:var(--primary);
 }
 
-.card:nth-child(2n) .suggested:hover{
+.card:nth-child(2n) .suggested a:hover {
   color:var(--secondary-dark);
   background-color: var(--white);
 }

@@ -61,6 +61,7 @@ const APP = {
 
       let searchStore = APP.DB.createObjectStore('searchStore',options);
       searchStore.createIndex('by_title','title',{unique:false})
+      APP.DB.createObjectStore('suggestStore',{keyPath:'movieid',autoIncrement:false})
       // create a new store that will hold search keywords and result
 
     }
@@ -74,7 +75,6 @@ const APP = {
         
       }
   },
-
   createTransaction: (storeName, mode) => {
     let tx = APP.DB.transaction(storeName,mode) // create transaction
 
@@ -86,17 +86,15 @@ const APP = {
 
 
   },
-  getDBResults: (storeName, keyValue) => {
-    //return the results from storeName where it matches keyValue
-
-  },
-  addResultsToDB: (tx, results, index = 0, keyword)=>{
+  addResultsToDB: (tx, results, index = 0,keyword,store)=>{
       console.log({ tx });
       console.log(index);
+      log(results)
       results.keyword = keyword
+      results.movieid = keyword
 
-      let searchStore = tx.objectStore('searchStore');
-      let addRequest = searchStore.add(results);
+      let storeName = tx.objectStore(store);
+      let addRequest = storeName.add(results);
     
       //handle the successful completion of the add
       addRequest.onsuccess = (ev) => {
@@ -113,9 +111,7 @@ const APP = {
       addRequest.onerror = (err) => {
         console.warn('Failed to add', err);
       };
-      APP.displayCards()
-    },
-
+  },
   addListeners: () => {
     console.log("adding listeners");
     //add listeners
@@ -170,7 +166,13 @@ const APP = {
       let resultsCards = document.getElementById('resultsCards')
       if(resultsCards){
       resultsCards.addEventListener('click',(ev)=>{
-        APP.cardListClicked(ev)
+        let targetClass = ev.target.parentNode.getAttribute('class')
+        switch(targetClass){
+          case "suggested": APP.suggestedClicked(ev)
+          break;
+          case "card": APP.cardListClicked(ev)
+          break;
+        }
       })
       }
     }
@@ -211,12 +213,12 @@ const APP = {
       APP.keyword=search
       APP.getConfig(search);
     }
+    //make sure it is not empty
+    //check the db for matches
+    //do a fetch call for search results
+    //save results to db
+    //navigate to url
   },
-  //make sure it is not empty
-  //check the db for matches
-  //do a fetch call for search results
-  //save results to db
-  //navigate to url
   getConfig: () => {
     fetch(APP.url)
       .then((response) => {
@@ -236,29 +238,42 @@ const APP = {
   },
   cardListClicked: (ev) => {
     ev.target.closest('li').classList.toggle('active');
-    log('card clicked')
-    let id = ev.target.parentNode.getAttribute('data-id')
-    log(id)
-    let url = `https://api.themoviedb.org/3/movie/${id}/recommendations?api_key=${APP.tmdbAPIKEY}&language=en-US&page=1`
     // user clicked on a movie card
-    //get the title and movie id
     
-    // search results for index to get movie id and title
-  let index = APP.results.findIndex(element=>element.id  == id)
-  let title = APP.results[index].title
-  log(title)
-  APP.suggestedClicked(index)
 },
-  suggestedClicked:(index)=>{
-
-    //check the db for matches
+  suggestedClicked:(ev)=>{
     //do a fetch for the suggest results
-    //save results to db
-    //build a url
-    //navigate to the suggest page
+//save results to db
+//build a url
+//navigate to the suggest page
+    let id = ev.target.getAttribute('data-id')
+    //check the db for matches]
+    APP.getSuggestedResults(id)
+    navigate()
+  //will then trigger the tx.oncomplete
+},
+  checkStore:(storeName,id)=>{
+  let tx = APP.DB.transaction(storeName, 'readonly');
+  tx.onerror = (err) => {
+    console.log('failed to successfully run the transaction');
+  };
+  tx.oncomplete = (ev) => {
+    console.log('finished the transaction... wanna do something else');
+  };
+  let searchStore = tx.objectStore(storeName,'readonly');
+  let getRequest = searchStore.get(id);
+  getRequest.onerror = (err) => {
+    //error with get request... will trigger the tx.onerror too
+  };
+  getRequest.onsuccess = (ev) => {
+    let obj = getRequest.result;
+    return obj
   }
-  ,
-  // getData: (endpoint, callback) => {
+},
+// getData: (endpoint, callback) => {
+
+
+
   //   //do a fetch call to the endpoint
   //   let url =
   //   fetch(url)
@@ -293,26 +308,39 @@ const APP = {
       .then((response) => response.json())
       .then((data) => {
         APP.results = data.results;
+        log(APP.results)
         let tx = APP.DB.transaction('searchStore', 'readwrite')
         log({tx});
-        APP.addResultsToDB(tx,APP.results,0,APP.keyword)
-        
+        APP.addResultsToDB(tx,APP.results,0,APP.keyword,'searchStore')
+        APP.displayCards()
       })
       .catch((err) => console.warn(`Fetch failed due to: ${err.message}`));
       // APP.displayCards is the callback
-  APP.displayCards()
+  
 }
       //check in DB for match of keyword in searchStore
   },
   getSuggestedResults: (movieid) => {
     //check if online
-    if (APP.isOnline){
-
-    }
     //check in DB for match of movieid in suggestStore
-    //if no match in DB do a fetch
-    // APP.displayCards is the callback
-  },
+    if(APP.checkStore('suggestStore',movieid)){console.log("suggested movies");}
+    //check if online
+      if(APP.isOnline){
+      //if no match in DB do a fetch
+      let url = `https://api.themoviedb.org/3/movie/${movieid}/recommendations?api_key=${APP.tmdbAPIKEY}&language=en-US&page=1`
+      fetch(url)
+      .then((response) => response.json())
+      .then((data) => {
+        let suggestedResults = data.results;
+        let tx = APP.DB.transaction('suggestStore', 'readwrite')
+        log({tx});
+        APP.addResultsToDB(tx,suggestedResults,0,movieid,'suggestStore')
+        
+      })
+      .catch((err) => console.warn(`Fetch failed due to: ${err.message}`));}
+      //if no match in DB do a fetch
+      // APP.displayCards is the callback
+    },
   displayCards: () => {
     let titleArea = document.querySelector('.titleArea')
     titleArea.innerHTML=`<p class="resultsMessage"> Showing results for  "${APP.keyword}" </p>`
@@ -334,7 +362,7 @@ const APP = {
       let li = document.createElement("li");
       li.setAttribute("class", "card")
       li.setAttribute('data-id',item.id);
-      li.innerHTML = `<h2>${item.title}</h2><div class="description"><p>${item.overview}</p></div> <h3> <a class="suggested">Suggested Movies</a> </h3>`;
+      li.innerHTML = `<h2>${item.title}</h2><div class="description"><p>${item.overview}</p></div> <h3 class="suggested"> <a data-id=${item.id}>Suggested Movies</a> </h3>`;
       li.prepend(img)
       APP.df.append(li);
     });
@@ -344,9 +372,8 @@ const APP = {
   navigate: (url) => {
     //change the current page
     window.location = url; //this should include the querystring
-  },
-};
-
+}
+}
 document.addEventListener("DOMContentLoaded", APP.init);
 
 class NetworkError extends Error {
