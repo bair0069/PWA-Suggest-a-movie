@@ -68,6 +68,11 @@ header{
   margin-bottom:1rem;
 }
 
+.logo {
+  text-decoration: none;
+  color:var(--primary);
+}
+
 /* - - - - - - - - - - - - - - - - Search Bar - - - - - - - - - - - - - - - */
 
 #inputSearch {
