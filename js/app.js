@@ -139,7 +139,7 @@ const APP = {
     let search = document.getElementById('inputSearch')
     search = search.value
     ev.preventDefault()
-  
+  APP.checkForSearchMatches(search)
     //check db for matches
     //if matches:
       //TODO:navigate to results
@@ -152,11 +152,31 @@ const APP = {
       //TODO:display results
   },
   //TODO:CHECK FOR SEARCH MATCHES
+  checkForSearchMatches:(search)=>{
+    let tx = APP.createTransaction('searchStore','readonly')
+    
+  },
   //- -TODO: create transaction
+  createTransaction:(storeName,mode)=>{
+    let tx = APP.DB.transaction(storeName,mode)
+
+    tx.onsuccess=(ev)=>{
+      tx=ev.result
+      return tx
+    }
+    tx.onerror=(err)=>{
+      console.log(err)
+    }
+    tx.oncomplete=(ev)=>{
+      console.log('transaction complete')
+    }
+    return tx
+    // Do something when all the data is added to the database.
+
+
+  },
   //- -TODO: check for matches
   //- -TODO: return results if match exists
-  checkForSearchMatches:()=>{
-  },
   //TODO:FETCH
   //TODO:ADD RESULTS TO DB
   addResultsToDB:()=>{
