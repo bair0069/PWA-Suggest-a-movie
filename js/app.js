@@ -236,8 +236,20 @@ const APP = {
   //TODO:GET SUGGESTED MOVIES
 
   //TODO:STORE SUGGESTED MOVIES
-  addSuggestToDB: () => {
-    console.log("adding suggested to db");
+  addSuggestToDB: (id,results) => {
+    console.log("adding results to db");
+    results.id = id;
+    let tx = APP.createTransaction("suggestStore", "readwrite");
+    console.log(results)
+    let searchStore = tx.objectStore("suggestStore");
+
+    let addRequest = searchStore.add(results);
+    addRequest.onsuccess = (ev) => {
+      console.log("success");
+    };
+    addRequest.onerror = (err) => {
+      console.warn("Failed to add", err.message);
+    };
   },
   //TODO:SHOW SUGGESTED MOVIES
   deferredPrompt: null,
