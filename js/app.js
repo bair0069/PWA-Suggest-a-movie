@@ -70,7 +70,7 @@ const APP = {
       dBOpenReq.onsuccess = (ev) => {
         APP.DB = ev.target.result;
         // reference to database used.
-
+        nextStep
         log(APP.DB.name, 'ready to be used')
         
       }
@@ -237,22 +237,14 @@ const APP = {
       });
   },
   cardListClicked: (ev) => {
-    ev.target.closest('li').classList.toggle('active');
+    let id = ev.target.parentNode.getAttribute('data-id')
+    APP.getSuggestedResults(id)
+    log(id)
     // user clicked on a movie card
     
 },
-  suggestedClicked:(ev)=>{
-    //do a fetch for the suggest results
-//save results to db
-//build a url
-//navigate to the suggest page
-    let id = ev.target.getAttribute('data-id')
-    //check the db for matches]
-    APP.getSuggestedResults(id)
-    navigate()
-  //will then trigger the tx.oncomplete
-},
-  checkStore:(storeName,id)=>{
+  checkStore:(storeName,keyword,nextStep)=>{
+
   let tx = APP.DB.transaction(storeName, 'readonly');
   tx.onerror = (err) => {
     console.log('failed to successfully run the transaction');
@@ -261,42 +253,42 @@ const APP = {
     console.log('finished the transaction... wanna do something else');
   };
   let searchStore = tx.objectStore(storeName,'readonly');
-  let getRequest = searchStore.get(id);
+  let getRequest = searchStore.get(keyword);
   getRequest.onerror = (err) => {
     //error with get request... will trigger the tx.onerror too
   };
   getRequest.onsuccess = (ev) => {
-    let obj = getRequest.result;
-    return obj
+    log(getRequest.results)
   }
-},
-// getData: (endpoint, callback) => {
+  nextStep
+  },
+  getData: (endpoint, callback) => {
 
 
 
-  //   //do a fetch call to the endpoint
-  //   let url =
-  //   fetch(url)
-  //     .then((resp) => {
-  //       if (resp.status >= 400) {
-  //         throw new NetworkError(
-  //           `Failed fetch to ${url}`,
-  //           resp.status,
-  //           resp.statusText
-  //         );
-  //       }
-  //       return resp.json();
-  //     })
-  //     .then((contents) => {
-  //       let results = contents.results;
-  //       //remove the properties we don't need
-  //       //save the updated results to APP.results
-  //       // call the callback
-  //     })
-  //     .catch((err) => {
-  //       //handle the NetworkError
-  //     });
-  // },
+    //do a fetch call to the endpoint
+    let url =
+    fetch(url)
+      .then((resp) => {
+        if (resp.status >= 400) {
+          throw new NetworkError(
+            `Failed fetch to ${url}`,
+            resp.status,
+            resp.statusText
+          );
+        }
+        return resp.json();
+      })
+      .then((contents) => {
+        let results = contents.results;
+        //remove the properties we don't need
+        //save the updated results to APP.results
+        // call the callback
+      })
+      .catch((err) => {
+        //handle the NetworkError
+      });
+  },
 
   getSearchResults: () => {
     console.log("searching");
@@ -312,7 +304,7 @@ const APP = {
         let tx = APP.DB.transaction('searchStore', 'readwrite')
         log({tx});
         APP.addResultsToDB(tx,APP.results,0,APP.keyword,'searchStore')
-        APP.displayCards()
+        APP.displayCards('searchStore',APP.keyword)
       })
       .catch((err) => console.warn(`Fetch failed due to: ${err.message}`));
       // APP.displayCards is the callback
@@ -335,13 +327,18 @@ const APP = {
         let tx = APP.DB.transaction('suggestStore', 'readwrite')
         log({tx});
         APP.addResultsToDB(tx,suggestedResults,0,movieid,'suggestStore')
+        APP.displayCards('suggestStore',movieid)
         
       })
       .catch((err) => console.warn(`Fetch failed due to: ${err.message}`));}
       //if no match in DB do a fetch
       // APP.displayCards is the callback
     },
-  displayCards: () => {
+  displayCards: (storeName,id,keyword) => {
+    log(APP.results)
+    APP.checkStore(storeName,id,keyword,log(APP.results))
+    
+
     let titleArea = document.querySelector('.titleArea')
     titleArea.innerHTML=`<p class="resultsMessage"> Showing results for  "${APP.keyword}" </p>`
     
@@ -362,18 +359,26 @@ const APP = {
       let li = document.createElement("li");
       li.setAttribute("class", "card")
       li.setAttribute('data-id',item.id);
-      li.innerHTML = `<h2>${item.title}</h2><div class="description"><p>${item.overview}</p></div> <h3 class="suggested"> <a data-id=${item.id}>Suggested Movies</a> </h3>`;
+      li.innerHTML = `<h2>${item.title}</h2>`;
       li.prepend(img)
       APP.df.append(li);
     });
     resultsCards.append(APP.df)
   },
 
-  navigate: (url) => {
+  navigate: (searchStyle,keyword,id,title) => {
     //change the current page
+    let url=null
+    if(searchStyle=='search'){
+      url = `http://127.0.0.1:5500/results.html?keyword=${keyword}`
+    }
+    else if (searchStyle=='suggest'){
+      url =`http://127.0.0.1:5500/results.html?id=${id}&title=${title}`
+    }
     window.location = url; //this should include the querystring
+  }
 }
-}
+
 document.addEventListener("DOMContentLoaded", APP.init);
 
 class NetworkError extends Error {
