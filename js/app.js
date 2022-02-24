@@ -1,4 +1,9 @@
 "use strict";
+//TODO:Improve Performance
+//--send messages
+//--receivemessages
+//--compare to steve's skeleton
+
 const APP = {
   isOnline: "onLine" in navigator && navigator.onLine,
 
@@ -9,13 +14,12 @@ const APP = {
     APP.getConfig()
     //- - Create Search DB
   },
-  //TODO: remove commented lines from SW
+  
   //REGISTER SW
   SW: null,
   registerSW: () => {
     //if the worker is registered
     if ("serviceWorker" in navigator) {
-      console.log("pretending to add service worker");
       navigator.serviceWorker.register("../sw.js").catch(function (err) {
         // Something went wrong during registration. The sw.js file
         // might be unavailable or contain a syntax error.
@@ -35,7 +39,6 @@ const APP = {
   DB: null,
   version: 1,
   createSearchDB: () => {
-    console.log("creating DB");
     let dbOpenRequest = indexedDB.open("searchDB", APP.version);
     dbOpenRequest.onupgradeneeded = (ev) => {
       APP.DB = ev.target.result; // set DB equal to result of onupgradeneeded
@@ -68,14 +71,9 @@ const APP = {
       APP.DB = dbOpenRequest.result;
       //- - Execute Page specific code
       APP.pageSpecific();
-      console.log(APP.DB.name, "ready to be used");
     };
   },
-  //TODO:PAGE SPECIFIC
-  //- -TODO: home page
-  //- -TODO: results page
-  //- -TODO: suggest page
-  //- -TODO: fourohfour page
+  //PAGE SPECIFIC
   pageSpecific: () => {
     if (document.body.id === "home") {
       //get previousSearches
@@ -86,6 +84,7 @@ const APP = {
       //TODO:add listeners to results cards
     }
     if (document.body.id === "suggest") {
+      APP.getSuggestFromDB()
     }
     if (document.body.id === "fourohfour") {
       //get previousSearches
@@ -95,7 +94,6 @@ const APP = {
   },
   //TODO:ADD LISTENERS
   addListeners: () => {
-    console.log("adding listeners");
     //add event listeners for DOM
     //check if already installed
     if (navigator.standalone) {
@@ -140,7 +138,6 @@ const APP = {
     let search = document.getElementById("inputSearch");
     search = search.value;
     ev.preventDefault();
-    console.log(search);
     //check db for matches
     if (search.length) {
       APP.checkForSearchMatches(search);
@@ -166,16 +163,12 @@ const APP = {
   checkForSearchMatches: (search) => {
     // check search for matches if none then fetch
     let tx = APP.createTransaction("searchStore", "readonly");
-    console.log({ tx });
     let searchStore = tx.objectStore("searchStore");
-    console.log(search);
     let request = searchStore.get(search);
-    console.log(request);
     request.onerror = (err) => {
       console.warn(err);
     };
     request.onsuccess = (ev) => {
-      console.log(ev.target);
       if (ev.target.result == undefined) {
         APP.fetchResults(search);
       } else {
@@ -193,12 +186,10 @@ const APP = {
     // Do something when all the data is added to the database.
     tx.oncomplete = (ev) => {
       tx = ev.result;
-      console.log("transaction complete");
       return tx;
     };
     return tx;
   },
-  //- -TODO: return results if match exists
   tmdbAPIKEY: "fd746aee539e0204da54b3425652e549",
   url: `https://api.themoviedb.org/3/configuration?api_key=fd746aee539e0204da54b3425652e549`,
   tmdbBASEURL: "https://api.themoviedb.org/3/",
@@ -228,7 +219,6 @@ const APP = {
         .then((response) => response.json())
         .then((data) => {
           APP.addResultsToDB(data.results, search);
-          console.log(data.results);
         })
         .catch((err) => console.warn(`Fetch failed due to: ${err.message}`));
     }
@@ -244,7 +234,6 @@ const APP = {
     let searchStore = tx.objectStore("searchStore");
     let addRequest = searchStore.add(results);
     addRequest.onsuccess = (ev) => {
-      console.log("success");
       APP.navigate("search", keyword);
     };
     addRequest.onerror = (err) => {
@@ -275,14 +264,11 @@ const APP = {
     let params = url.searchParams;
     let keyword = `${params.get("keyword")}`;
     let results = null;
-    console.log(keyword);
     let tx = APP.createTransaction("searchStore", "readonly");
-
     let searchStore = tx.objectStore("searchStore");
-    console.log(searchStore);
+    
 
     let request = searchStore.get(keyword);
-    console.log(request);
 
     request.onerror = (err) => {
       console.warn(err);
@@ -293,19 +279,14 @@ const APP = {
     };
   },
   //DISPLAY
-  displayCards: (results,keyword) => {
+  displayCards: async (results,keyword) => {
     let titleArea = document.querySelector(".titleArea");
     titleArea.innerHTML = `<p class="resultsMessage"> Showing results for  "${keyword}" </p>`;
 
-    //display all the movie cards based on the results array
-    //in APP.results
-    //these results could be from the database or from a fetch
-    console.log(results);
+    // create df to store cards for search results and for suggest results
     let resultsCards = document.getElementById('resultsCards')
     let df = document.createDocumentFragment()
     resultsCards.textContent="";
-    console.log('clearing')
-    console.log(`APP.tmdbIMAGEBASEURL}w185${results[0].poster_path}`)
     resultsCards.setAttribute("class", "resultsCards");
     results.forEach((item) => {
       let img = document.createElement("img")
@@ -315,19 +296,62 @@ const APP = {
       let li = document.createElement("li");
       li.setAttribute("class", "card")
       li.setAttribute('data-id',item.id);
+      li.setAttribute('data-title',item.title)
       li.innerHTML = `<h2>${item.title}</h2><div class="description"><p>${item.overview}</p></div> <h3 class="suggested"> <a data-id=${item.id}>Suggested Movies</a> </h3>`;
       li.innerHTML = `<h2>${item.title}</h2>`;
       li.prepend(img)
       df.append(li);
     });
     resultsCards.append(df)
+    resultsCards.addEventListener('click',(ev)=>{
+      APP.resultsCardClicked(ev)
+    })
   },
   //TODO:CLICK ON CARD
+  resultsCardClicked:(ev)=>{
+    let id = ev.target.parentNode.getAttribute('data-id')
+    let title = ev.target.parentNode.getAttribute('data-title')
+    APP.getSuggest(id,title)
+  },
   //TODO:GET SUGGESTED MOVIES
+  getSuggest:(id,title)=>{
+    let tx = APP.createTransaction('suggestStore','readonly')
+    let suggestStore = tx.objectStore('suggestStore')
+    let request = suggestStore.get(id)
+
+    request.onerror = (err)=>{console.warn(err)}
+    request.onsuccess=(ev)=>{
+      if(ev.target.result===undefined){
+        APP.fetchSuggestions(id,title)
+      }
+      else{
+        APP.navigate('suggest'," ",id,title)
+      }
+    }
+
+
+  },
+
+  fetchSuggestions:(id,title)=>{
+    //check if online
+    //if not online navigate to 404 page
+      if(APP.isOnline){
+      //if no match in DB do a fetch
+      let url = `https://api.themoviedb.org/3/movie/${id}/recommendations?api_key=${APP.tmdbAPIKEY}&language=en-US&page=1`
+      fetch(url)
+      .then((response) => response.json())
+      .then((data) => {
+        APP.addSuggestToDB(id,data.results,title)
+      })
+      .catch((err) => console.warn(`Fetch failed due to: ${err.message}`));
+    }
+    else{
+      APP.navigate('offline')
+    }
+  },
 
   //TODO:STORE SUGGESTED MOVIES
-  addSuggestToDB: (id, results) => {
-    console.log("adding results to db");
+  addSuggestToDB: (id, results,title) => {
     results.id = id;
     let tx = APP.createTransaction("suggestStore", "readwrite");
     console.log(results);
@@ -335,13 +359,32 @@ const APP = {
 
     let addRequest = searchStore.add(results);
     addRequest.onsuccess = (ev) => {
-      console.log("success");
+      APP.navigate('suggest'," ",id,title)
     };
     addRequest.onerror = (err) => {
       console.warn("Failed to add", err.message);
     };
   },
+  getSuggestFromDB: () => {
+    let url = new URL(window.location.href)
+    let params =url.searchParams
+    let id = params.get('id')
+    let title = params.get('title')
+
+    let tx = APP.createTransaction("suggestStore", "readonly");
+    let searchStore = tx.objectStore("suggestStore");
+    let getRequest = searchStore.get(id);
+    getRequest.onsuccess = (ev) => {
+      APP.displayCards(ev.target.result,title)
+    };
+    getRequest.onerror = (err) => {
+      console.warn("Failed to add", err.message);
+    };
+  },
   //TODO:SHOW SUGGESTED MOVIES
+  
+
+  //GET PREV SEARCHES FOR 404 and INDEX.html
   getPrevSearches:()=>{
     let tx = APP.createTransaction('searchStore','readonly')
 
@@ -371,9 +414,9 @@ const APP = {
   },
   deferredPrompt: null,
   //TODO:INSTALL PROMPT
-  //TODO:ONLINE/OFFLINE
+  //ONLINE/OFFLINE
   changeStatus: (status) => {
-    if (status='online'){
+    if (status=='online'){
     document.querySelector('.offline').style.display="none"
     }
     else{document.querySelector('.offline').style.display="inline-block"}

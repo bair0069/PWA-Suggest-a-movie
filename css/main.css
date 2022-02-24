@@ -180,6 +180,7 @@ header{
 .card:hover {
   cursor:pointer;
   outline: solid .25rem var(--accent);
+  transition-delay: .25s;
   transition-duration: .25s;
   transform: scaleX(1.15)
             scaleY(1.15);
