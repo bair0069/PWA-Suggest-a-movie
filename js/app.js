@@ -2,8 +2,8 @@
 const APP = {
   isOnline: "onLine" in navigator && navigator.onLine,
 
-  //TODO:INIT
-  init: async () => {
+  //INIT
+  init: () => {
     //- - Register SW
     APP.registerSW();
     //- - Create Search DB
@@ -81,11 +81,11 @@ const APP = {
   //- -TODO: suggest page
   //- -TODO: fourohfour page
   pageSpecific: () => {
-    console.log("adding page specific");
     if (document.body.id === "home") {
       //TODO:add listeners to previousSearches
     }
     if (document.body.id === "results") {
+      APP.getResultsFromDB()
       //TODO:add listeners to results cards
     }
     if (document.body.id === "suggest") {
@@ -141,40 +141,40 @@ const APP = {
     let search = document.getElementById("inputSearch");
     search = search.value;
     ev.preventDefault();
-    let match = await APP.checkForSearchMatches(search);
+    console.log(APP.checkForSearchMatches(search))
     //check db for matches
     //if (match):
-    //TODO:navigate to results
+    //navigate to results
+    // await APP.navigate('search',search)
     //TODO:pull results from DB using url keyword
+      // - DONE in pageSpecific
     //TODO: display results
+      // -DONE in displayCards
     //Else If doesn't match:
     //TODO:fetch results
     await APP.fetchResults(search);
-    //TODO:store results
+    //TODO:store results needs to be passed results and keyword
     // this is done in the fetch
     //TODO:navigate to results page
+    // await APP.navigate('search',search)
     //TODO:display results
   },
   //TODO:CHECK FOR SEARCH MATCHES
   //- -TODO: make matches return result not just true or false
   checkForSearchMatches: (search) => {
     // check search for matches if none then fetch
-    let bool = null;
     let tx = APP.createTransaction("searchStore", "readonly");
     console.log({ tx });
     let searchStore = tx.objectStore("searchStore");
-    let request = searchStore.get(search);
+    let request = searchStore.get(search)
     request.onerror = (err) => {
       console.warn(err);
-      bool = false;
-      return bool;
     };
-    request.onsuccess = (ev) => {
-      //TODO: Display CArds
-      bool = true;
-      return bool;
+    request.oncomplete = (ev) => {
+      APP.results = ev.target.result
+      console.log(APP.results)
     };
-    return bool;
+    return 'this is working',APP.results
   },
   //- - create transaction
   createTransaction: (storeName, mode) => {
@@ -192,15 +192,12 @@ const APP = {
     return tx;
   },
   //- -TODO: return results if match exists
-
-
   tmdbAPIKEY: "fd746aee539e0204da54b3425652e549",
   
   tmdbBASEURL: "https://api.themoviedb.org/3/",
-  //TODO:FETCH
+  //FETCH
   fetchResults: (search) => {
     //check if online
-    console.log(APP.isOnline);
     if (APP.isOnline) {
       let url = `https://api.themoviedb.org/3/search/movie?api_key=${APP.tmdbAPIKEY}&language=en-US&query=${search}&page=1&include_adult=false`;
       fetch(url)
@@ -212,26 +209,51 @@ const APP = {
       // APP.addResultsToDB is the callback
     }
   },
-  //TODO:ADD RESULTS TO DB
+  //ADD RESULTS TO DB
   addResultsToDB: (results, keyword) => {
-    console.log("adding results to db");
     results.keyword = keyword;
     let tx = APP.createTransaction("searchStore", "readwrite");
-    console.log(results)
     let searchStore = tx.objectStore("searchStore");
-
     let addRequest = searchStore.add(results);
     addRequest.onsuccess = (ev) => {
       console.log("success");
     };
     addRequest.onerror = (err) => {
-      console.warn("Failed to add", err.message);
+      console.warn("Failed to add", err.target.error);
     };
   },
-  //TODO:NAVIGATE
+  //NAVIGATE
+  navigate:(searchType,keyword,id,title)=>{
+    //build custom url for suggest or search
+    let url =""
+    if (searchType=='search') {
+      url=`http://127.0.0.1:5500/results.html?keyword=${keyword}` 
+    }
+    else if (searchType=='suggest'){
+      url=`http://127.0.0.1:5500/suggest.html?id=${id}&title=${title}`
+    }
+
+    window.location = url
+
+  },
   tmdbIMAGEBASEURL: null,
   tmdbCONFIGDATA: null,
+  //TODO: GET RESULTS
+  getResultsFromDB:()=>{
+    let url = new URL(window.location.href)
+    let params = url.searchParams
+    let keyword = `"${params.get('keyword')}"`
+    console.log(keyword)
+    APP.checkForSearchMatches(keyword)
+
+  },
   //TODO:DISPLAY
+  displayCards:()=>{
+    
+    // create transaction
+    // get results from database
+    // display results
+  },
   //TODO:CLICK ON CARD
   //TODO:GET SUGGESTED MOVIES
 
