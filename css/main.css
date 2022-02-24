@@ -91,11 +91,28 @@ header{
 
 /* - - - - - - - - - - - - - - - - titleArea - - - - - - - - - - - - - - - */
 
-.titleArea p {
-  font-family: "Raleway", sans-serif;
-  color: var(--white);
-  font-size: 2rem;
+.titleArea h1,h3,p{
+  font-family: "Raleway",sans-serif;
   text-align: center
+}
+
+.titleArea h3 ul {
+  text-align: left;
+}
+
+.titleArea p {
+  font-size: 2rem;
+  color: var(--white);
+}
+
+/* - - - - - - - - - - - - - - - - ContentArea - - - - - - - - - - - - - - - */
+
+.previousSearches {
+  list-style-type:none
+}
+.previousSearches a:hover{
+  cursor:pointer;
+  color:var(--accent);
 }
 /* - - - - - - - - - - - - - - - - Cards - - - - - - - - - - - - - - - */
 
@@ -182,6 +199,16 @@ header{
 
 .card.active img {
   display: none;
+}
+
+/* - - - - - - - - - - - - - - - - Offline Status Symbol - - - - - - - - - - - - - - - */
+
+.offline {
+  background-color:var(--white);
+  width:15rem;
+}
+.offline img {
+  width:15rem;
 }
 
 
