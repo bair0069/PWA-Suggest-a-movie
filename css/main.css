@@ -32,7 +32,7 @@ h1, h2, h3, h4, h5 {
 
 h1 {
   margin-top: 0;
-  font-size: 3.052rem;
+  font-size: 2.7rem;
 }
 
 h2 {font-size: 2.441rem;}
@@ -64,6 +64,7 @@ header{
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
+  text-align: center;
   gap: 1rem;
   margin-bottom:1rem;
 }
@@ -71,6 +72,15 @@ header{
 .logo {
   text-decoration: none;
   color:var(--primary);
+}
+
+/* - - - - - - - - - - - - - - - - Search Form - - - - - - - - - - - - - - - */
+
+form {
+  display:flex;
+  flex-direction: row-reverse;
+  flex-wrap: nowrap;
+  padding-left: 1rem;
 }
 
 /* - - - - - - - - - - - - - - - - Search Bar - - - - - - - - - - - - - - - */
@@ -84,6 +94,30 @@ header{
 
 #inputSearch:placeholder{
   fill:var(--primary-light);
+}
+
+/* - - - - - - - - - - - - - - - - Search Form - - - - - - - - - - - - - - - */
+
+form button {
+  border:none;
+  background-color:var(--secondary);
+}
+
+form button:hover {
+  cursor: pointer;
+  outline:solid .1rem var(--primary-light);
+}
+
+form button:active {
+  background-color: var(--secondary-dark);
+}
+
+
+
+form button svg {
+  fill:var(--primary);
+  transform: scaleX(150%)
+  scaleY(150%);
 }
 
 /* = = = = = = = = = = = = = = = = = = = Main = = = = = = = = = = = = = = = = = = */
@@ -187,21 +221,6 @@ header{
   box-shadow: 0rem 1rem 1rem black;
 }
 
-.card .description {
-  transform: translateY(100%);
-  display: none;
-  padding:0rem 1rem;
-}
-
-.card.active .description {
-  transform:translateY(0);
-  display:grid;
-}
-
-.card.active img {
-  display: none;
-}
-
 /* - - - - - - - - - - - - - - - - Offline Status Symbol - - - - - - - - - - - - - - - */
 
 .offline {
@@ -215,6 +234,7 @@ header{
 
 /*===============================    Tablet Size         ============================= */
 @media only screen and (min-width:45rem) {
+  
   
   html {
     font-size:120%;

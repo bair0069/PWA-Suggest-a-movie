@@ -26,6 +26,7 @@ const cacheList = [
   "./img/offline-1.png",
   "./img/noimage.png",
   "./img/safari-pinned-tab.svg",
+  "./img/search_black_24dp.svg",
   //fonts:
   "https://fonts.googleapis.com/css2?family=Expletus+Sans&display=swap",
   "https://fonts.googleapis.com/css2?family=Raleway&display=swap",
@@ -37,7 +38,7 @@ const cacheList = [
 self.addEventListener("install", (ev) => {
   ev.waitUntil(
     caches.open(staticCache).then((cache) => cache.addAll(cacheList))
-  );
+    );
 });
 
 self.addEventListener("activate", (ev) => {
@@ -106,6 +107,7 @@ function sendMessage(msg) {
     }
   });
 }
+limitCache(dynamicCache,30)
 
 function limitCache(nm, size = 25) {
   //remove some files from the dynamic cache
@@ -113,6 +115,7 @@ function limitCache(nm, size = 25) {
     cache.keys().then((keys) => {
       if (keys.length > size) {
         cache.delete(keys[0]).then(() => {
+          console.log(keys.length)
           limitCacheSize(nm, size);
         });
       }

@@ -1,8 +1,15 @@
 "use strict";
 //TODO:Improve Performance
+
+
+//-- make header fixed position
+//-- make a small footer for the bottom that credits TMDB
+//-- make the image cache dynamic and limited.
+//-- use a for each loop?? to limit the size?
 //--send messages
 //--receivemessages
-//--compare to steve's skeleton
+//--compare to steve's outline starter code
+
 
 const APP = {
   isOnline: "onLine" in navigator && navigator.onLine,
@@ -68,7 +75,7 @@ const APP = {
       console.warn(err.message);
     };
     dbOpenRequest.onsuccess = (ev) => {
-      APP.DB = dbOpenRequest.result;
+      APP.DB = ev.target.result;
       //- - Execute Page specific code
       APP.pageSpecific();
     };
@@ -81,7 +88,6 @@ const APP = {
     }
     if (document.body.id === "results") {
       APP.getResultsFromDB();
-      //TODO:add listeners to results cards
     }
     if (document.body.id === "suggest") {
       APP.getSuggestFromDB()
@@ -142,7 +148,7 @@ const APP = {
     if (search.length) {
       APP.checkForSearchMatches(search);
     }
-    //if (match):
+    //if match
     //navigate to results
     //DONE in checkForSearchMatches
     //pull results from DB using url keyword
@@ -169,7 +175,9 @@ const APP = {
       console.warn(err);
     };
     request.onsuccess = (ev) => {
+      console.log(ev.target)
       if (ev.target.result == undefined) {
+        console.log('no match found')
         APP.fetchResults(search);
       } else {
         APP.navigate("search", search);
@@ -218,7 +226,14 @@ const APP = {
       fetch(url)
         .then((response) => response.json())
         .then((data) => {
-          APP.addResultsToDB(data.results, search);
+          let mappedResults = data.results.map((item)=>{
+            let {id,poster_path,release_date,title,popularity} = item;
+            return {id,poster_path,release_date,title,popularity}
+          })
+
+          console.log(mappedResults)
+
+          APP.addResultsToDB(mappedResults, search);
         })
         .catch((err) => console.warn(`Fetch failed due to: ${err.message}`));
     }
@@ -229,10 +244,13 @@ const APP = {
   },
   //ADD RESULTS TO DB
   addResultsToDB: (results, keyword) => {
-    results.keyword = keyword;
+    
+
+    let storedObject = {results,keyword}
+    
     let tx = APP.createTransaction("searchStore", "readwrite");
     let searchStore = tx.objectStore("searchStore");
-    let addRequest = searchStore.add(results);
+    let addRequest = searchStore.add(storedObject);
     addRequest.onsuccess = (ev) => {
       APP.navigate("search", keyword);
     };
@@ -274,12 +292,14 @@ const APP = {
       console.warn(err);
     };
     request.onsuccess = (ev) => {
-      results = ev.target.result;
+      results = ev.target.result.results;
       APP.displayCards(results,keyword);
     };
   },
   //DISPLAY
   displayCards: async (results,keyword) => {
+    document.title = `Results for "${keyword}"`
+
     let titleArea = document.querySelector(".titleArea");
     titleArea.innerHTML = `<p class="resultsMessage"> Showing results for  "${keyword}" </p>`;
 
@@ -297,8 +317,10 @@ const APP = {
       li.setAttribute("class", "card")
       li.setAttribute('data-id',item.id);
       li.setAttribute('data-title',item.title)
-      li.innerHTML = `<h2>${item.title}</h2><div class="description"><p>${item.overview}</p></div> <h3 class="suggested"> <a data-id=${item.id}>Suggested Movies</a> </h3>`;
-      li.innerHTML = `<h2>${item.title}</h2>`;
+      li.innerHTML = `
+      <h2>${item.title}</h2>
+      <p>Release Date: ${item.release_date}</p>
+      <p>Popularity rating: ${item.popularity}</p>`;
       li.prepend(img)
       df.append(li);
     });
@@ -309,9 +331,11 @@ const APP = {
   },
   //TODO:CLICK ON CARD
   resultsCardClicked:(ev)=>{
+    let evClass = ev.target.parentNode.getAttribute('class')
+    if(evClass=='card'){
     let id = ev.target.parentNode.getAttribute('data-id')
     let title = ev.target.parentNode.getAttribute('data-title')
-    APP.getSuggest(id,title)
+    APP.getSuggest(id,title)}
   },
   //TODO:GET SUGGESTED MOVIES
   getSuggest:(id,title)=>{
@@ -335,29 +359,37 @@ const APP = {
   fetchSuggestions:(id,title)=>{
     //check if online
     //if not online navigate to 404 page
-      if(APP.isOnline){
-      //if no match in DB do a fetch
+    if(APP.isOnline){
       let url = `https://api.themoviedb.org/3/movie/${id}/recommendations?api_key=${APP.tmdbAPIKEY}&language=en-US&page=1`
       fetch(url)
       .then((response) => response.json())
       .then((data) => {
-        APP.addSuggestToDB(id,data.results,title)
+        console.log(data.results)
+        if(data.results.length){
+        let mappedResults = data.results.map((item)=>{
+        let {id,poster_path,release_date,title,popularity} = item;
+        return {id,poster_path,release_date,title,popularity}
+      })
+        APP.addSuggestToDB(id,mappedResults,title)}
+        else(APP.navigate('offline'))
       })
       .catch((err) => console.warn(`Fetch failed due to: ${err.message}`));
     }
-    else{
+    else
+    {
       APP.navigate('offline')
     }
+
   },
 
   //TODO:STORE SUGGESTED MOVIES
   addSuggestToDB: (id, results,title) => {
-    results.id = id;
+    
     let tx = APP.createTransaction("suggestStore", "readwrite");
     console.log(results);
     let searchStore = tx.objectStore("suggestStore");
 
-    let addRequest = searchStore.add(results);
+    let addRequest = searchStore.add({results,id});
     addRequest.onsuccess = (ev) => {
       APP.navigate('suggest'," ",id,title)
     };
@@ -375,7 +407,7 @@ const APP = {
     let searchStore = tx.objectStore("suggestStore");
     let getRequest = searchStore.get(id);
     getRequest.onsuccess = (ev) => {
-      APP.displayCards(ev.target.result,title)
+      APP.displayCards(ev.target.result.results,title)
     };
     getRequest.onerror = (err) => {
       console.warn("Failed to add", err.message);
@@ -425,3 +457,11 @@ const APP = {
 };
 
 document.addEventListener("DOMContentLoaded", APP.init);
+
+class NetworkError extends Error {
+  constructor(msg, status, statusText){
+      super(msg);
+      this.status = status;
+      this.statusText = statusText;
+  }
+}
