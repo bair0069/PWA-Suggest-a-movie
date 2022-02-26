@@ -1,4 +1,4 @@
-'use strict'
+"use strict";
 
 const version = 1;
 const isOnline = true;
@@ -32,13 +32,13 @@ const cacheList = [
   "https://fonts.googleapis.com/css2?family=Raleway&display=swap",
   "https://fonts.googleapis.com/css2?family=Faustina&display=swap",
   // any extra js files:
-  "./js/app.js"
+  "./js/app.js",
 ];
 
 self.addEventListener("install", (ev) => {
   ev.waitUntil(
     caches.open(staticCache).then((cache) => cache.addAll(cacheList))
-    );
+  );
 });
 
 self.addEventListener("activate", (ev) => {
@@ -69,7 +69,7 @@ self.addEventListener("fetch", (ev) => {
         cacheRes ||
         fetch(ev.request)
           .then((fetchRes) => {
-            if (!fetchRes.status>=400) throw new Error(fetchRes.statusText);
+            if (!fetchRes.status >= 400) throw new Error(fetchRes.statusText);
             return caches.open(dynamicCache).then((cache) => {
               let copy = fetchRes.clone(); //make a copy of the response
               cache.put(ev.request, copy); //put the copy into the cache
@@ -96,7 +96,8 @@ self.addEventListener("message", (ev) => {
   console.log(ev.data);
   //message received from script
   if (ev.data.ONLINE) {
-    isOnline = ev.data.ONLINE;
+    let isOnline = ev.data.ONLINE;
+    sendMessage(isOnline);
   }
 });
 
@@ -107,7 +108,7 @@ function sendMessage(msg) {
     }
   });
 }
-limitCache(dynamicCache,30)
+limitCache(dynamicCache, 30);
 
 function limitCache(nm, size = 25) {
   //remove some files from the dynamic cache
@@ -115,7 +116,7 @@ function limitCache(nm, size = 25) {
     cache.keys().then((keys) => {
       if (keys.length > size) {
         cache.delete(keys[0]).then(() => {
-          console.log(keys.length)
+          console.log(keys.length);
           limitCacheSize(nm, size);
         });
       }

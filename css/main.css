@@ -21,7 +21,7 @@ body {
 
 html {font-size: 100%;} /*16px*/
 
-p {margin-bottom: 1rem;}
+p {margin: .2rem;}
 
 h1, h2, h3, h4, h5 {
   margin:0;
@@ -32,18 +32,20 @@ h1, h2, h3, h4, h5 {
 
 h1 {
   margin-top: 0;
-  font-size: 2.7rem;
+  font-size: 2.5rem;
 }
 
-h2 {font-size: 2.441rem;}
+h2 {font-size: 2rem;}
 
-h3 {font-size: 1.953rem;}
+h3 {font-size: 1.7rem;}
 
 h4 {font-size: 1.563rem;}
 
 h5 {font-size: 1.25rem;}
 
-small, .text_small {font-size: 0.8rem;}
+small, .text_small {
+  font-family: 'Raleway',sans-serif;
+  font-size: 0.8rem;}
 
 /* - - - - - - - - - - - - - - - - Color Variables - - - - - - - - - - - - - - - */
 
@@ -60,18 +62,23 @@ small, .text_small {font-size: 0.8rem;}
 /* = = = = = = = = = = = = = = = = Header = = = = = = = = = = = = = = = */
 
 header{
+  position:sticky;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
   text-align: center;
   gap: 1rem;
-  margin-bottom:1rem;
+  margin:1rem;
 }
 
 .logo {
   text-decoration: none;
   color:var(--primary);
+}
+
+.logo img {
+  width:6rem
 }
 
 /* - - - - - - - - - - - - - - - - Search Form - - - - - - - - - - - - - - - */
@@ -86,9 +93,9 @@ form {
 /* - - - - - - - - - - - - - - - - Search Bar - - - - - - - - - - - - - - - */
 
 #inputSearch {
-  height:2rem;
-  font-size: 2rem;
-  font-family: "Faustina" , serif;
+  height:3rem;
+  font-size: 1.5rem;
+  font-family: "Raleway" , serif;
   width:max(15rem,100%);
 }
 
@@ -96,9 +103,11 @@ form {
   fill:var(--primary-light);
 }
 
-/* - - - - - - - - - - - - - - - - Search Form - - - - - - - - - - - - - - - */
+/* - - - - - - - - - - - - - - - - Search Button- - - - - - - - - - - - - - - */
 
 form button {
+  width: 3rem;
+  height: 3rem;
   border:none;
   background-color:var(--secondary);
 }
@@ -116,8 +125,8 @@ form button:active {
 
 form button svg {
   fill:var(--primary);
-  transform: scaleX(150%)
-  scaleY(150%);
+  height:2.5rem;
+  width:2.5rem;
 }
 
 /* = = = = = = = = = = = = = = = = = = = Main = = = = = = = = = = = = = = = = = = */
@@ -135,7 +144,7 @@ form button svg {
 }
 
 .titleArea p {
-  font-size: 2rem;
+  font-size: 1.5rem;
   color: var(--white);
 }
 
@@ -150,72 +159,42 @@ form button svg {
 }
 /* - - - - - - - - - - - - - - - - Cards - - - - - - - - - - - - - - - */
 
+.cardsArea {
+  font-size: 80%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 #resultsCards {
-  margin: 0,0;
+  width:100%;
+  margin: 0;
   padding:0;
   display: flex;
   flex-flow: row wrap;
   justify-content: center;
+  gap:1rem;
 }
 
 .card {
-  width:15rem;
+  width:8rem;
   display:flex;
   text-align: center;
   flex-direction: column;
-  justify-content: space-around;
-  background-color: var(--white);
-  outline-width: .25rem;
-  outline-color:var(--secondary);
-  outline-style:solid;
-  color:var(--secondary);
-  overflow: hidden;
-}
-
-.card:nth-child(2n){
+  justify-content: space-between;
   background-color: var(--secondary-dark);
-  color: var(--white);
-  outline-width: .25rem;
-  outline-color:var(--primary-light);
-  outline-style:solid; 
-}
-
-.suggested a {
-  display: flex;
-  font-size: 1.25rem;
-  flex-direction: column;
-  color: var(--secondary);
-  border: .25rem solid var(--accent);
-  border-radius: 2rem;
-  margin:.25rem;
-}
-
-.suggested a:hover {
+  border:.2rem solid var(--secondary);
+  border-radius: 1rem;
   color:var(--white);
-  background-color:var(--secondary-dark);
+  overflow: hidden;
+  margin-bottom: .2rem;
 }
-
-.suggested a:active {
-  color:var(--secondary-light);
-  background-color:var(--secondary-dark);
-}
-
-.card:nth-child(2n) .suggested a {
-  color:var(--primary);
-}
-
-.card:nth-child(2n) .suggested a:hover {
-  color:var(--secondary-dark);
-  background-color: var(--white);
-}
-
-
-
 .card:hover {
   cursor:pointer;
   outline: solid .25rem var(--accent);
-  transition-delay: .25s;
-  transition-duration: .25s;
+  border-radius: 0rem;
+  transition-delay: .15s;
+  transition-duration: .15s;
   transform: scaleX(1.15)
             scaleY(1.15);
   box-shadow: 0rem 1rem 1rem black;

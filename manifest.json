@@ -1,6 +1,7 @@
 {
   "name":"Suggest-A-Movie",
   "short_name":"SAM",
+  "id":"./index.html",
   "description": "This app suggests movies to users",
   "icons": [
     {
@@ -15,13 +16,13 @@
     },
     {
       "src": "./img/apple-touch-icon.png",
-      "sizes": "128x128",
+      "sizes": "180x180",
       "type": "image/png",
       "purpose": "maskable"
     },
     {
       "src": "./img/mstile-150x150.png",
-      "sizes": "150x150",
+      "sizes": "270x270",
       "type": "image/png",
       "purpose": "maskable"
     },
