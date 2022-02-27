@@ -317,7 +317,7 @@ const APP = {
     };
   },
   //DISPLAY
-  displayCards: async (results, keyword) => {
+  displayCards: (results, keyword) => {
     document.title = `Results for "${keyword}"`;
 
     let titleArea = document.querySelector(".titleArea");
@@ -341,7 +341,7 @@ const APP = {
       li.setAttribute("data-id", item.id);
       li.setAttribute("data-title", item.title);
       li.innerHTML = `
-      <h5>${item.title}</h5>
+      <h2>${item.title}</h2>
       <small>Release Date: ${item.release_date}</small>
       <small>Popularity rating: ${item.popularity}</small>`;
       li.prepend(img);
@@ -394,7 +394,7 @@ const APP = {
               return { id, poster_path, release_date, title, popularity };
             });
             APP.addSuggestToDB(id, mappedResults, title);
-          } else {APP.navigate("offline")};
+          } else {APP.navigate("offline")}
         })
         .catch((err) => console.warn(`Fetch failed due to: ${err.message}`));
     } else {
