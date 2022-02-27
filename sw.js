@@ -69,6 +69,7 @@ self.addEventListener("fetch", (ev) => {
         cacheRes ||
         fetch(ev.request)
           .then((fetchRes) => {
+            console.log('A fetch call is made')
             if (!fetchRes.status >= 400) throw new Error(fetchRes.statusText);
             return caches.open(dynamicCache).then((cache) => {
               let copy = fetchRes.clone(); //make a copy of the response
