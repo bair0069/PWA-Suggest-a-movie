@@ -43,6 +43,7 @@ const APP = {
   },
   //ONLINE/OFFLINE
   changeStatus: (status) => {
+    console.log('online status changed')
     if (status == "online") {
       document.querySelector(".offline").style.display = "none";
       APP.sendMessage("Browser is online");

@@ -121,9 +121,3 @@ function limitCache(nm, size = 25) {
     })
   });
 }
-
-function checkForConnection() {
-  //try to talk to a server and do a fetch() with HEAD method.
-  //to see if we are really online or offline
-  //send a message back to the browser
-}
