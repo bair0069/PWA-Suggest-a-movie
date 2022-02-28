@@ -4,7 +4,7 @@ const version = 1;
 const isOnline = true;
 const staticCache = `PWA-Static-Search-APP-${version}`;
 const dynamicCache = `PWA-Dynamic-Search-APP-${version}`;
-const cacheLimit = 100;
+const cacheLimit = 35;
 const cacheList = [
   //Pages
   "./",
@@ -34,7 +34,6 @@ const cacheList = [
   // any extra js files:
   "./js/app.js",
 ];
-
 self.addEventListener("install", (ev) => {
   ev.waitUntil(
     caches.open(staticCache).then((cache) => cache.addAll(cacheList))
@@ -69,6 +68,7 @@ self.addEventListener("fetch", (ev) => {
         cacheRes ||
         fetch(ev.request)
           .then((fetchRes) => {
+            limitCache(dynamicCache,cacheLimit)
             console.log('A fetch call is made')
             if (!fetchRes.status >= 400) throw new Error(fetchRes.statusText);
             return caches.open(dynamicCache).then((cache) => {
@@ -109,19 +109,16 @@ function sendMessage(msg) {
     }
   });
 }
-limitCache(dynamicCache, 30);
 
 function limitCache(nm, size = 25) {
   //remove some files from the dynamic cache
   caches.open(nm).then((cache) => {
     cache.keys().then((keys) => {
-      if (keys.length > size) {
-        cache.delete(keys[0]).then(() => {
-          console.log(keys.length);
-          limitCacheSize(nm, size);
-        });
+      if (keys.length >= size) {
+        cache.delete(keys[0])
+        limitCache(nm,size)
       }
-    });
+    })
   });
 }
 

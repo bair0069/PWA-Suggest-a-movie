@@ -151,7 +151,8 @@ form button svg {
 /* - - - - - - - - - - - - - - - - ContentArea - - - - - - - - - - - - - - - */
 
 .previousSearches {
-  list-style-type:none
+  list-style-type:none;
+  font-size:2rem; 
 }
 .previousSearches a:hover{
   cursor:pointer;
