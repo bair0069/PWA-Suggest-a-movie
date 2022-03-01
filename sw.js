@@ -45,6 +45,7 @@ self.addEventListener("activate", (ev) => {
     caches
       .keys()
       .then((keys) => {
+        limitCache(dynamicCache,cacheLimit)
         return Promise.all(
           keys
             .filter((key) => {
@@ -68,7 +69,6 @@ self.addEventListener("fetch", (ev) => {
         cacheRes ||
         fetch(ev.request)
           .then((fetchRes) => {
-            limitCache(dynamicCache,cacheLimit)
             console.log('A fetch call is made')
             if (!fetchRes.status >= 400) throw new Error(fetchRes.statusText);
             return caches.open(dynamicCache).then((cache) => {
