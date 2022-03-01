@@ -1,13 +1,7 @@
 "use strict";
-//TODO:Improve Performance
 
-//-- make header fixed position
 //-- make a small footer for the bottom that credits TMDB
-//-- make the image cache dynamic and limited.
-//-- use a for each loop?? to limit the size?
-//--send messages
-//--receivemessages
-//--compare to steve's outline starter code
+
 
 const APP = {
   isOnline: "onLine" in navigator && navigator.onLine,

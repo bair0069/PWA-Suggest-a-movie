@@ -14,7 +14,7 @@ body {
   color:var(--primary);
   background-color: var(--secondary-dark);
   font-family: "Faustina", serif;
-  overflow-y:none;  
+  overflow-y:auto;  
 }
 
 /* - - - - - - - - - - - - - - - - Type Scale - - - - - - - - - - - - - - - */
@@ -71,7 +71,6 @@ header{
   align-items: center;
   text-align: center;
   background-color: var(--secondary-dark);
-  gap: 1rem;
   margin:1rem;
 }
 
@@ -91,7 +90,7 @@ form {
   display:flex;
   flex-direction: row-reverse;
   flex-wrap: nowrap;
-  padding-left: 1rem;
+  padding-left: 2rem;
 }
 
 /* - - - - - - - - - - - - - - - - Search Bar - - - - - - - - - - - - - - - */
@@ -138,6 +137,7 @@ form button svg {
 
 /* - - - - - - - - - - - - - - - - titleArea - - - - - - - - - - - - - - - */
 
+
 .titleArea h1,h3,p{
   font-family: "Raleway",sans-serif;
   text-align: center
@@ -156,7 +156,7 @@ form button svg {
 
 .contentArea {
   height:90vh;
-  overflow-y: scroll;
+  padding: 0rem;
 }
 
 .previousSearches {
@@ -172,8 +172,10 @@ form button svg {
 .cardsArea {
   font-size: 80%;
   display: flex;
+  z-index: 1;
   flex-direction: column;
   align-items: center;
+  margin-bottom: 1rem;
 }
 
 #resultsCards {
@@ -226,6 +228,44 @@ form button svg {
   width:15rem;
 }
 
+
+/* - - - - - - - - - - - - - - - - FOOTER- - - - - - - - - - - - - - - */
+
+#footer {
+  width: 100%;
+  bottom: 0rem;
+  z-index: auto;
+  position:sticky;
+  background-color: var(--secondary);
+  margin-top:.25rem;
+  
+}
+
+#footer .container {
+  width: 100%;
+  margin-top: .25rem;
+  margin-bottom: 0;
+  display: flex;
+  z-index: 1;
+  justify-content: space-around;
+  align-items: center;
+}
+
+#footer .container a {
+  font-family: 'Raleway',sans-serif;
+  text-decoration: none;
+  color: var(--primary);
+}
+#footer .container a:hover {
+  color: var(--primary-light);
+}
+#footer .container a:active {
+  color: var(--primary-dark);
+}
+
+#footer .container svg {
+  width:4rem;
+}
 
 /*===============================    Tablet Size         ============================= */
 @media only screen and (min-width:45rem) {
