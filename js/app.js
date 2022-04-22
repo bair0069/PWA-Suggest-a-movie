@@ -5,14 +5,18 @@
 
 const APP = {
   isOnline: "onLine" in navigator && navigator.onLine,
-
+  tmdbAPIKEY: "fd746aee539e0204da54b3425652e549",
+  url: `https://api.themoviedb.org/3/configuration?api_key=fd746aee539e0204da54b3425652e549`,
+  tmdbBASEURL: "https://api.themoviedb.org/3/",
+  tmdbIMGURL: null,
+  tmdbCONFIGDATA : null,
   //INIT
-  init: () => {
+  init: async ()  => {
     //- - Register SW
+    await APP.getConfig();
     APP.registerSW();
     APP.addListeners();
     setTimeout(APP.checkNavCount, 10000)
-    APP.getConfig();
     //- - Create Search DB
   },
 
@@ -167,20 +171,20 @@ const APP = {
     //navigate to results
     //DONE in checkForSearchMatches
     //pull results from DB using url keyword
-    // - DONE in pageSpecific
+    // happens in pageSpecific
     //display results
-    // -DONE in displayCards
+    // happens in displayCards
     //Else If doesn't match:
     //fetch results
-    // DONE in checkForSearchMatches
+    // happens in checkForSearchMatches
     //store results needs to be passed results and keyword
     // this is done in the fetch
     //navigate to results page
     //done in the addResultsToDB function
     //display results
   },
-  //TODO:CHECK FOR SEARCH MATCHES
-  //- -TODO: make matches return result not just true or false
+  //CHECK FOR SEARCH MATCHES
+  //make matches return result not just true or false
   checkForSearchMatches: (search) => {
     // check search for matches if none then fetch
     let tx = APP.createTransaction("searchStore", "readonly");
@@ -213,21 +217,21 @@ const APP = {
     };
     return tx;
   },
-  tmdbAPIKEY: "fd746aee539e0204da54b3425652e549",
-  url: `https://api.themoviedb.org/3/configuration?api_key=fd746aee539e0204da54b3425652e549`,
-  tmdbBASEURL: "https://api.themoviedb.org/3/",
+  
   //FETCH
-  getConfig: () => {
-    fetch(APP.url)
+  getConfig: async () => {
+    await fetch(APP.url)
       .then((response) => {
         return response.json();
       })
       .then((data) => {
+        console.log("setting base image url");
         APP.tmdbIMAGEBASEURL = data.images.secure_base_url;
         APP.tmdbCONFIGDATA = data.images;
       })
       .catch((err) => {
         {
+          console.log(err);
           throw new NetworkError('failed to fetch', APP.url)
           
         }
@@ -290,8 +294,6 @@ const APP = {
 
     window.location = url;
   },
-  tmdbIMAGEBASEURL: null,
-  tmdbCONFIGDATA: null,
   //GET RESULTS
   getResultsFromDB: () => {
     let url = new URL(window.location.href);
@@ -306,13 +308,13 @@ const APP = {
     request.onerror = (err) => {
       console.warn(err);
     };
-    request.onsuccess = (ev) => {
+    request.onsuccess = async (ev) => {
       results = ev.target.result.results;
-      APP.displayCards(results, keyword);
+      await APP.displayCards(results, keyword);
     };
   },
   //DISPLAY
-  displayCards: (results, keyword) => {
+  displayCards: async (results, keyword) => {
     document.title = `Results for "${keyword}"`;
 
     let titleArea = document.querySelector(".titleArea");
@@ -323,7 +325,7 @@ const APP = {
     let df = document.createDocumentFragment();
     resultsCards.textContent = "";
     resultsCards.setAttribute("class", "resultsCards");
-    results.forEach((item) => {
+    await results.forEach((item) => {
       let img = document.createElement("img");
       if (item.poster_path) {
         img.src = `${APP.tmdbIMAGEBASEURL}w342${item.poster_path}`;
@@ -347,7 +349,7 @@ const APP = {
       APP.resultsCardClicked(ev);
     });
   },
-  //TODO:CLICK ON CARD
+  //CLICK ON CARD
   resultsCardClicked: (ev) => {
     let evClass = ev.target.parentNode.getAttribute("class");
     if (evClass == "card") {
@@ -356,7 +358,7 @@ const APP = {
       APP.getSuggest(id, title);
     }
   },
-  //TODO:GET SUGGESTED MOVIES
+  //GET SUGGESTED MOVIES
   getSuggest: (id, title) => {
     let tx = APP.createTransaction("suggestStore", "readonly");
     let suggestStore = tx.objectStore("suggestStore");
@@ -397,7 +399,7 @@ const APP = {
     }
   },
 
-  //TODO:STORE SUGGESTED MOVIES
+  //STORE SUGGESTED MOVIES
   addSuggestToDB: (id, results, title) => {
     let tx = APP.createTransaction("suggestStore", "readwrite");
     console.log(results);
@@ -420,14 +422,14 @@ const APP = {
     let tx = APP.createTransaction("suggestStore", "readonly");
     let searchStore = tx.objectStore("suggestStore");
     let getRequest = searchStore.get(id);
-    getRequest.onsuccess = (ev) => {
-      APP.displayCards(ev.target.result.results, title);
+    getRequest.onsuccess = async (ev)  => {
+      await APP.displayCards(ev.target.result.results, title);
     };
     getRequest.onerror = (err) => {
       console.warn("Failed to add", err.message);
     };
   },
-  //TODO:SHOW SUGGESTED MOVIES
+  //SHOW SUGGESTED MOVIES
 
   //GET PREV SEARCHES FOR 404 and INDEX.html
   getPrevSearches: () => {
@@ -459,9 +461,9 @@ const APP = {
     searches.append(df);
   },
   deferredPrompt: null,
-  //TODO:INSTALL PROMPT
+  //INSTALL PROMPT
   updateNavCount: (ev) => {
-    //TODO: when the app loads check to see if the sessionStorage key exists
+    // when the app loads check to see if the sessionStorage key exists
     // if the number exists then increment by 1.
     // triggered by the pageshow event
     console.log(ev);

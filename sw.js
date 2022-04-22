@@ -1,7 +1,6 @@
 "use strict";
 
 const version = 1;
-const isOnline = true;
 const staticCache = `PWA-Static-Search-APP-${version}`;
 const dynamicCache = `PWA-Dynamic-Search-APP-${version}`;
 const cacheLimit = 35;
@@ -70,7 +69,7 @@ self.addEventListener("fetch", (ev) => {
         fetch(ev.request)
           .then((fetchRes) => {
             console.log('A fetch call is made')
-            if (!fetchRes.status >= 400) throw new Error(fetchRes.statusText);
+            if (fetchRes.status >= 399) throw new Error(fetchRes.statusText);
             return caches.open(dynamicCache).then((cache) => {
               let copy = fetchRes.clone(); //make a copy of the response
               cache.put(ev.request, copy); //put the copy into the cache
