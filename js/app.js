@@ -284,12 +284,12 @@ const APP = {
     //build custom url for suggest or search
     let url = "";
     if (searchType == "search") {
-      url = `http://127.0.0.1:5500/results.html?keyword=${keyword}`;
+      url = `https://kbp-suggest-a-movie.netlify.app/results.html?keyword=${keyword}`;
       APP.getResultsFromDB();
     } else if (searchType == "suggest") {
-      url = `http://127.0.0.1:5500/suggest.html?id=${id}&title=${title}`;
+      url = `https://kbp-suggest-a-movie.netlify.app/suggest.html?id=${id}&title=${title}`;
     } else if (searchType == "offline") {
-      url = `http://127.0.0.1:5500/404.html`;
+      url = `https://kbp-suggest-a-movie.netlify.app/404.html`;
     }
 
     window.location = url;
