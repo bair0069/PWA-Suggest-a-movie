@@ -225,7 +225,6 @@ const APP = {
         return response.json();
       })
       .then((data) => {
-        console.log("setting base image url");
         APP.tmdbIMAGEBASEURL = data.images.secure_base_url;
         APP.tmdbCONFIGDATA = data.images;
       })
@@ -251,7 +250,6 @@ const APP = {
             let { id, poster_path, release_date, title, popularity } = item;
             return { id, poster_path, release_date, title, popularity };
           });
-          console.log(mappedResults);
 
         APP.addResultsToDB(mappedResults, search);
         }
@@ -271,8 +269,10 @@ const APP = {
 
     let tx = APP.createTransaction("searchStore", "readwrite");
     let searchStore = tx.objectStore("searchStore");
+    
+
     let addRequest = searchStore.add(storedObject);
-    addRequest.onsuccess = (ev) => {
+    addRequest.onsuccess = () => {
       APP.navigate("search", keyword);
     };
     addRequest.onerror = (err) => {
@@ -284,12 +284,12 @@ const APP = {
     //build custom url for suggest or search
     let url = "";
     if (searchType == "search") {
-      url = `http://127.0.0.1:5500/results.html?keyword=${keyword}`;
+      url = `http://bair0069.github.io/PWA-Suggest-a-movie/results.html?keyword=${keyword}`;
       APP.getResultsFromDB();
     } else if (searchType == "suggest") {
-      url = `http://127.0.0.1:5500/suggest.html?id=${id}&title=${title}`;
+      url = `http://bair0069.github.io/PWA-Suggest-a-movie/i/suggest.html?id=${id}&title=${title}`;
     } else if (searchType == "offline") {
-      url = `http://127.0.0.1:5500/404.html`;
+      url = `http://bair0069.github.io/PWA-Suggest-a-movie/i/404.html`;
     }
 
     window.location = url;
@@ -406,7 +406,7 @@ const APP = {
     let searchStore = tx.objectStore("suggestStore");
 
     let addRequest = searchStore.add({ results, id });
-    addRequest.onsuccess = (ev) => {
+    addRequest.onsuccess = () => {
       APP.navigate("suggest", " ", id, title);
     };
     addRequest.onerror = (err) => {
@@ -433,7 +433,7 @@ const APP = {
 
   //GET PREV SEARCHES FOR 404 and INDEX.html
   getPrevSearches: () => {
-    let tx = APP.createTransaction("searchStore", "readonly");
+    let tx = APP.createTransaction("searchStore", "readwrite");
 
     let searchStore = tx.objectStore("searchStore");
 
@@ -453,6 +453,7 @@ const APP = {
       APP.navigate("search", keyword);
     });
     let df = document.createDocumentFragment();
+
     result.forEach((item) => {
       let li = document.createElement("li");
       li.innerHTML = `<a class="prevSearchItem">${item}</a>`;
