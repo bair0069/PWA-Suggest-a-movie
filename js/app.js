@@ -284,12 +284,12 @@ const APP = {
     //build custom url for suggest or search
     let url = "";
     if (searchType == "search") {
-      url = `http://bair0069.github.io/PWA-Suggest-a-movie/results.html?keyword=${keyword}`;
+      url = `http://127.0.0.1:5500/results.html?keyword=${keyword}`;
       APP.getResultsFromDB();
     } else if (searchType == "suggest") {
-      url = `http://bair0069.github.io/PWA-Suggest-a-movie/i/suggest.html?id=${id}&title=${title}`;
+      url = `http://127.0.0.1:5500/suggest.html?id=${id}&title=${title}`;
     } else if (searchType == "offline") {
-      url = `http://bair0069.github.io/PWA-Suggest-a-movie/i/404.html`;
+      url = `http://127.0.0.1:5500/404.html`;
     }
 
     window.location = url;
